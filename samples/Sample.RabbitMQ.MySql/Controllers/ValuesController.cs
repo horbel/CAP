@@ -49,7 +49,7 @@ namespace Sample.RabbitMQ.MySql.Controllers
         }
 
         [Route("~/ef/transaction")]
-        public IActionResult EntityFrameworkWithTransaction([FromServices]AppDbContext dbContext)
+        public async Task<IActionResult> EntityFrameworkWithTransaction([FromServices]AppDbContext dbContext)
         {
             using (var trans = dbContext.Database.BeginTransaction(_capBus, autoCommit: false))
             {
@@ -57,7 +57,7 @@ namespace Sample.RabbitMQ.MySql.Controllers
 
                 for (int i = 0; i < 5; i++)
                 {
-                    _capBus.Publish("sample.rabbitmq.mysql", DateTime.Now);
+                    await _capBus.PublishAsync("sample.rabbitmq.mysql", i);
                 }
 
                 dbContext.SaveChanges();
